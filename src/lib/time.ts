@@ -60,6 +60,10 @@ export function formatMatchDateTimeIST(dateUTC: string) {
   return `${formatMatchDateIST(dateUTC)} — ${formatMatchTimeIST(dateUTC)} IST`
 }
 
+export function formatInTimezone(dateUTC: string, timezone: string, pattern = 'EEE, MMM d, h:mm a') {
+  return formatInTimeZone(dateUTC, timezone || 'UTC', pattern)
+}
+
 export function formatShortDateIST(dateUTC: string) {
   return formatInTimeZone(dateUTC, IST_TIMEZONE, 'EEE, d MMM')
 }
@@ -79,6 +83,41 @@ export function groupMatchesByISTDate(matches: Match[]) {
 export function getVenueLocalTime(dateUTC: string, timezone = 'UTC') {
   const cityLabel = timezone.split('/').pop()?.replace(/_/g, ' ') || 'local'
   return `${formatInTimeZone(dateUTC, timezone, 'EEE, MMM d, h:mm a')} ${cityLabel}`
+}
+
+export function formatVenueLocalTime(dateUTC: string, venue?: Venue) {
+  const timezone = resolveVenueTimezone(venue)
+  const city = venue?.city || timezone.split('/').pop()?.replace(/_/g, ' ') || 'Venue'
+  return `${formatInTimezone(dateUTC, timezone, 'EEE, MMM d, h:mm a')} ${city}`
+}
+
+export function getBrowserTimezone() {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || IST_TIMEZONE
+  } catch {
+    return IST_TIMEZONE
+  }
+}
+
+export function formatUserLocalTime(dateUTC: string) {
+  const timezone = getBrowserTimezone()
+  return `${formatInTimezone(dateUTC, timezone, 'EEE, MMM d, h:mm a')} ${timezone}`
+}
+
+export function getTimezoneAbbreviation(dateUTC: string, timezone: string) {
+  try {
+    return formatInTimezone(dateUTC, timezone, 'zzz')
+  } catch {
+    return timezone === 'UTC' ? 'UTC' : timezone
+  }
+}
+
+export function getTimezoneDateRolloverLabel(dateUTC: string, primaryTz: string, comparisonTz: string) {
+  const primaryDate = formatInTimezone(dateUTC, primaryTz, 'yyyy-MM-dd')
+  const comparisonDate = formatInTimezone(dateUTC, comparisonTz, 'yyyy-MM-dd')
+
+  if (primaryDate === comparisonDate) return ''
+  return comparisonDate > primaryDate ? 'Next day there' : 'Previous day there'
 }
 
 export function getCountdownParts(dateUTC: string) {

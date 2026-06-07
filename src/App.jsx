@@ -4,9 +4,14 @@ import RollingFootball from './components/effects/RollingFootball'
 import DesktopLoadingScreen from './components/effects/DesktopLoadingScreen'
 import ErrorBoundary from './components/features/ErrorBoundary'
 import MobileBottomNav from './components/layout/MobileBottomNav'
+import CinematicIntro from './components/onboarding/CinematicIntro'
+import FirstTimeSetup from './components/onboarding/FirstTimeSetup'
+import ProductTour from './components/onboarding/ProductTour'
 import Sidebar from './components/layout/Sidebar'
 import TopNav from './components/layout/TopNav'
+import { useFirstVisit } from './hooks/useFirstVisit'
 import { useLiveScores } from './hooks/useLiveScores'
+import { useProductTour } from './hooks/useProductTour'
 import { useAppStore } from './store/useAppStore'
 import Favorites from './pages/Favorites'
 import Groups from './pages/Groups'
@@ -34,6 +39,8 @@ export default function App() {
   useLiveScores()
   const appTheme = useAppStore((state) => state.appTheme)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsed)
+  const firstVisit = useFirstVisit()
+  const productTour = useProductTour(firstVisit.tourStartSignal)
 
   useEffect(() => {
     try {
@@ -80,6 +87,15 @@ export default function App() {
       <RollingFootball />
       <MobileBottomNav />
       <DesktopLoadingScreen />
+      <CinematicIntro isOpen={firstVisit.showIntro} onComplete={firstVisit.completeIntro} />
+      <FirstTimeSetup isOpen={firstVisit.showSetup} onComplete={firstVisit.completeSetup} onSkip={firstVisit.skipSetup} />
+      <ProductTour
+        isActive={productTour.isActive}
+        currentStep={productTour.currentStep}
+        onBack={productTour.back}
+        onNext={productTour.next}
+        onSkip={productTour.skip}
+      />
     </div>
   )
 }

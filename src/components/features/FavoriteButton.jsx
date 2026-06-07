@@ -23,6 +23,7 @@ export default function FavoriteButton({ type = 'match', id, label = 'Favorite' 
       aria-label={label}
       title={label}
       onClick={handleClick}
+      data-tour="favorite-action"
     >
       <Star fill={active ? 'currentColor' : 'none'} />
     </button>

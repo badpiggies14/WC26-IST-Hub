@@ -4,6 +4,8 @@ import APIStatusBadge from '../components/features/APIStatusBadge'
 import ReminderButton from '../components/features/ReminderButton'
 import ShareMatchButton from '../components/features/ShareMatchButton'
 import StadiumBackground from '../components/features/StadiumBackground'
+import TimeDisplayModeToggle from '../components/time/TimeDisplayModeToggle'
+import TimezoneComparePanel from '../components/time/TimezoneComparePanel'
 import CountdownTimer from '../components/ui/CountdownTimer'
 import TeamFlag from '../components/ui/TeamFlag'
 import { formatMatchDateIST, formatMatchTimeIST, getVenueLocalTime, getWatchMeter } from '../lib/time'
@@ -114,11 +116,16 @@ export default function MatchDetail() {
         <aside className="panel-card">
           <h3>Match Actions</h3>
           <div style={{ display: 'grid', gap: 12 }}>
+            <TimeDisplayModeToggle compact />
             <ReminderButton match={match} />
             <ShareMatchButton match={match} />
             <AddToCalendarButton match={match} />
           </div>
         </aside>
+      </div>
+
+      <div style={{ marginTop: 24 }}>
+        <TimezoneComparePanel match={match} />
       </div>
     </>
   )

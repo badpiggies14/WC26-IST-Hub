@@ -5,9 +5,11 @@ import APIStatusBadge from '../components/features/APIStatusBadge'
 import ReminderButton from '../components/features/ReminderButton'
 import StadiumBackground from '../components/features/StadiumBackground'
 import LegendFlagSurprise from '../components/fun/LegendFlagSurprise'
+import TimeDisplayModeToggle from '../components/time/TimeDisplayModeToggle'
 import CountdownTimer from '../components/ui/CountdownTimer'
 import MatchCard from '../components/ui/MatchCard'
 import TeamFlag from '../components/ui/TeamFlag'
+import { REPLAY_TUTORIAL_EVENT } from '../hooks/useProductTour'
 import { formatDateKeyIST, formatMatchDateIST, formatMatchTimeIST, getWatchMeter } from '../lib/time'
 import { useWorldCupData } from '../hooks/useWorldCupData'
 import { useAppStore } from '../store/useAppStore'
@@ -83,7 +85,11 @@ export default function Home() {
             <Link className="btn btn-ghost" to="/favorites">
               Pick Favorite Teams
             </Link>
+            <button className="btn btn-ghost" type="button" onClick={() => window.dispatchEvent(new Event(REPLAY_TUTORIAL_EVENT))}>
+              Show Tutorial
+            </button>
           </div>
+          <TimeDisplayModeToggle />
           <div className="hero-tournament-strip" aria-label="World Cup 2026 quick facts">
             <span>48 Nations</span>
             <span>104 Fixtures</span>
@@ -102,7 +108,7 @@ export default function Home() {
 
         <div className="hero-side-stack">
           {nextMatch ? (
-            <article className="glass-card opening-card">
+            <article className="glass-card opening-card" data-tour="next-match-card">
               <div className="opening-top">
                 <span className="card-kicker">Next Fixture</span>
                 <span className="card-kicker">{nextMatch.roundLabel}</span>

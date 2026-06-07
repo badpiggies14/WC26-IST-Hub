@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react'
 import { Bell, Check, Coffee, Download, Palette, ShieldCheck, Sparkles, Trophy, Zap } from 'lucide-react'
 import { ROLLING_FOOTBALL_EVENT, ROLLING_FOOTBALL_STORAGE_KEY } from '../components/effects/RollingFootball'
 import APIStatusBadge from '../components/features/APIStatusBadge'
+import { LEGEND_FUN_EVENT, LEGEND_FUN_STORAGE_KEY } from '../components/fun/LegendFlagSurprise'
+import TimeDisplayModeToggle from '../components/time/TimeDisplayModeToggle'
+import { REPLAY_INTRO_EVENT, RESET_SETUP_EVENT } from '../hooks/useFirstVisit'
+import { REPLAY_TUTORIAL_EVENT } from '../hooks/useProductTour'
 import { buildScheduleCsv, buildSchedulePdf, downloadTextFile } from '../lib/calendar'
+import { readStorage, writeStorage } from '../lib/storage'
 import { useWorldCupData } from '../hooks/useWorldCupData'
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion'
 import { useAppStore } from '../store/useAppStore'
@@ -67,6 +72,11 @@ function writeRollingBallSetting(enabled) {
   window.dispatchEvent(new Event(ROLLING_FOOTBALL_EVENT))
 }
 
+function writeLegendFunSetting(enabled) {
+  writeStorage(LEGEND_FUN_STORAGE_KEY, enabled)
+  window.dispatchEvent(new Event(LEGEND_FUN_EVENT))
+}
+
 function SegmentedToggleRow({ title, body, enabled, onChange }) {
   return (
     <div className="settings-row">
@@ -96,6 +106,7 @@ export default function Settings() {
   const appTheme = useAppStore((state) => state.appTheme)
   const setAppTheme = useAppStore((state) => state.setAppTheme)
   const [rollingBallEnabled, setRollingBallEnabled] = useState(() => readRollingBallSetting(false))
+  const [legendFunEnabled, setLegendFunEnabled] = useState(() => readStorage(LEGEND_FUN_STORAGE_KEY, true))
 
   useEffect(() => {
     setRollingBallEnabled(readRollingBallSetting(prefersReducedMotion))
@@ -104,6 +115,11 @@ export default function Settings() {
   const updateRollingBall = (enabled) => {
     setRollingBallEnabled(enabled)
     writeRollingBallSetting(enabled)
+  }
+
+  const updateLegendFun = (enabled) => {
+    setLegendFunEnabled(enabled)
+    writeLegendFunSetting(enabled)
   }
 
   return (
@@ -117,6 +133,71 @@ export default function Settings() {
       </header>
 
       <div className="settings-stack">
+        <section className="panel-card experience-panel">
+          <h3>
+            <Sparkles size={20} /> Experience
+          </h3>
+          <div className="settings-row">
+            <div>
+              <strong>Replay Intro</strong>
+              <p style={{ margin: '4px 0 0', color: 'var(--text-secondary)' }}>
+                Run the stadium-entry animation again.
+              </p>
+            </div>
+            <button className="btn btn-ghost" type="button" onClick={() => window.dispatchEvent(new Event(REPLAY_INTRO_EVENT))}>
+              Replay
+            </button>
+          </div>
+          <div className="settings-row">
+            <div>
+              <strong>Replay Tutorial</strong>
+              <p style={{ margin: '4px 0 0', color: 'var(--text-secondary)' }}>
+                Restart the guided tour with spotlight hints.
+              </p>
+            </div>
+            <button className="btn btn-ghost" type="button" onClick={() => window.dispatchEvent(new Event(REPLAY_TUTORIAL_EVENT))}>
+              Start Tour
+            </button>
+          </div>
+          <div className="settings-row">
+            <div>
+              <strong>Reset First-Time Setup</strong>
+              <p style={{ margin: '4px 0 0', color: 'var(--text-secondary)' }}>
+                Open the favorite teams, time display, reminders, and effects setup again.
+              </p>
+            </div>
+            <button className="btn btn-ghost" type="button" onClick={() => window.dispatchEvent(new Event(RESET_SETUP_EVENT))}>
+              Reset
+            </button>
+          </div>
+          <SegmentedToggleRow
+            title="Rolling Football Scroll Effect"
+            body="Show the subtle pitch-track football that rolls with page scroll on desktop and mobile."
+            enabled={rollingBallEnabled}
+            onChange={updateRollingBall}
+          />
+          <SegmentedToggleRow
+            title="Legend Flag Surprise"
+            body="Show the playful legend flag widget on desktop."
+            enabled={legendFunEnabled}
+            onChange={updateLegendFun}
+          />
+          <div className="settings-row">
+            <div>
+              <strong>Time Display Mode</strong>
+              <p style={{ margin: '4px 0 0', color: 'var(--text-secondary)' }}>
+                IST always stays the hero time; other zones appear as supporting context.
+              </p>
+            </div>
+            <TimeDisplayModeToggle compact />
+          </div>
+          {prefersReducedMotion ? (
+            <div className="info-card">
+              <p>Reduced motion is enabled in your system, so intro and tutorial motion will be simplified.</p>
+            </div>
+          ) : null}
+        </section>
+
         <section className="panel-card">
           <h3>
             <Bell size={20} /> Match Alerts
@@ -139,16 +220,10 @@ export default function Settings() {
           <h3>Time & Display</h3>
           <div className="info-card">
             <p>
-              <ShieldCheck size={18} /> Timezone Lock - All match times are currently fixed to Indian Standard Time
-              (IST) to ensure sync across the platform.
+              <ShieldCheck size={18} /> IST First - Match cards keep Indian Standard Time as the biggest time, with
+              venue, browser local, and UTC context available when selected.
             </p>
           </div>
-          <SegmentedToggleRow
-            title="Rolling Football Scroll Effect"
-            body="Show the subtle pitch-track football that rolls with page scroll on desktop and mobile."
-            enabled={rollingBallEnabled}
-            onChange={updateRollingBall}
-          />
         </section>
 
         <section className="panel-card brand-theme-card">

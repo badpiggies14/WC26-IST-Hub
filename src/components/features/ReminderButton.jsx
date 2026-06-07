@@ -21,7 +21,7 @@ export default function ReminderButton({ match, compact = false }) {
 
   if (compact) {
     return (
-      <button className="star-btn" type="button" aria-label={getReminderCta(match)} onClick={(event) => {
+      <button className="star-btn" type="button" aria-label={getReminderCta(match)} data-tour="reminder-action" onClick={(event) => {
         event.preventDefault()
         event.stopPropagation()
         setReminder(15)
@@ -32,7 +32,7 @@ export default function ReminderButton({ match, compact = false }) {
   }
 
   return (
-    <div className="reminder-control">
+    <div className="reminder-control" data-tour="reminder-action">
       <button className="btn btn-primary" type="button" onClick={() => setOpen((value) => !value)}>
         <Bell /> {getReminderCta(match)}
       </button>

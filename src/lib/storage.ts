@@ -7,7 +7,14 @@ export const CACHE_KEYS = {
   groups: 'wc2026_cache_groups',
   timestamp: 'wc2026_cache_timestamp',
   favorites: 'wc2026_favorites',
-  reminders: 'wc2026_reminders'
+  reminders: 'wc2026_reminders',
+  introSeen: 'wc2026_intro_seen',
+  tutorialCompleted: 'wc2026_tutorial_completed',
+  setupCompleted: 'wc2026_setup_completed',
+  rollingBallEnabled: 'wc2026_rolling_ball_enabled',
+  legendFunEnabled: 'wc2026_legend_fun_enabled',
+  timeDisplayMode: 'wc2026_time_display_mode',
+  introAnimationsEnabled: 'wc2026_intro_animations_enabled'
 } as const
 
 function canUseStorage() {

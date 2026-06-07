@@ -21,7 +21,7 @@ export default function APIStatusBadge({ compact = false }) {
   const status = isLoading ? 'loading' : apiStatus
 
   return (
-    <div className={`api-status api-status--${status} ${compact ? 'compact' : ''}`} title={error || ''}>
+    <div className={`api-status api-status--${status} ${compact ? 'compact' : ''}`} title={error || ''} data-tour="api-status">
       <span className="live-dot" />
       <span>{labels[status] || 'API'}</span>
       {!compact ? <small>{status === 'cached' ? `from ${formatCacheTimestamp(lastUpdated)}` : lastUpdated ? formatCacheTimestamp(lastUpdated) : 'ready'}</small> : null}

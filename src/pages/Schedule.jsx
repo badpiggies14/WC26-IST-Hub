@@ -2,6 +2,7 @@ import { RefreshCw } from 'lucide-react'
 import { useMemo } from 'react'
 import APIStatusBadge from '../components/features/APIStatusBadge'
 import LegendFlagSurprise from '../components/fun/LegendFlagSurprise'
+import TimeDisplayModeToggle from '../components/time/TimeDisplayModeToggle'
 import MatchCard from '../components/ui/MatchCard'
 import { formatDateKeyIST, formatMatchDateIST, formatMatchTimeIST, groupMatchesByISTDate } from '../lib/time'
 import { useWorldCupData } from '../hooks/useWorldCupData'
@@ -106,6 +107,7 @@ export default function Schedule() {
           <p className="mono-note">All visible kickoff times are converted to Asia/Kolkata from venue-local API data.</p>
         </div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <TimeDisplayModeToggle compact />
           <APIStatusBadge />
           <button className="btn btn-ghost" type="button" onClick={() => refresh()}>
             <RefreshCw /> Refresh
@@ -117,7 +119,7 @@ export default function Schedule() {
         <LegendFlagSurprise compact />
       </div>
 
-      <div className="filter-tabs" role="tablist" aria-label="Schedule filters">
+      <div className="filter-tabs" role="tablist" aria-label="Schedule filters" data-tour="filters-search">
         {filters.map(([id, label]) => (
           <button
             key={id}

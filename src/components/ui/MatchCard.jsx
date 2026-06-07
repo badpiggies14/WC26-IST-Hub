@@ -3,7 +3,15 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { getTeam } from '../../data/teams'
 import { downloadMatchIcs } from '../../lib/calendar'
-import { formatMatchTimeIST, formatShortDateIST, getVenueLocalTime, getWatchMeter } from '../../lib/time'
+import {
+  formatInTimezone,
+  formatMatchTimeIST,
+  formatShortDateIST,
+  formatUserLocalTime,
+  formatVenueLocalTime,
+  getVenueLocalTime,
+  getWatchMeter
+} from '../../lib/time'
 import { useCountdown } from '../../hooks/useCountdown'
 import { useAppStore } from '../../store/useAppStore'
 import FavoriteButton from '../features/FavoriteButton'
@@ -22,6 +30,7 @@ export default function MatchCard({ match, variant = 'default' }) {
   const liveMatches = useAppStore((state) => state.liveMatches)
   const favoriteTeams = useAppStore((state) => state.favoriteTeams)
   const favoriteMatches = useAppStore((state) => state.favoriteMatches)
+  const timeDisplayMode = useAppStore((state) => state.timeDisplayMode || 'ist')
   const live = liveMatches[match.id]
   const isApiMatch = Boolean(match.dateUTC)
   const home = isApiMatch ? match.homeTeam : getTeam(match.home)
@@ -48,11 +57,23 @@ export default function MatchCard({ match, variant = 'default' }) {
     if (match.id) navigate(`/match/${match.id}`)
   }
 
+  const supportingTimes = []
+  if (isApiMatch && match.venue && ['venue', 'compare'].includes(timeDisplayMode)) {
+    supportingTimes.push(['Venue', formatVenueLocalTime(dateUTC, match.venue)])
+  }
+  if (isApiMatch && ['my', 'compare'].includes(timeDisplayMode)) {
+    supportingTimes.push(['My Time', formatUserLocalTime(dateUTC)])
+  }
+  if (isApiMatch && ['utc', 'compare'].includes(timeDisplayMode)) {
+    supportingTimes.push(['UTC', `${formatInTimezone(dateUTC, 'UTC', 'EEE, MMM d, h:mm a')} UTC`])
+  }
+
   return (
     <motion.article
       role="button"
       tabIndex={0}
       className={`match-card ${isLive || isHalftime ? 'match-card--live' : ''} ${isFinished ? 'match-card--finished' : ''} ${isFavorite ? 'match-card--favorite' : ''}`}
+      data-tour="match-card"
       onClick={openDetail}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -89,7 +110,10 @@ export default function MatchCard({ match, variant = 'default' }) {
             {homeScore ?? 0} - {awayScore ?? 0}
           </div>
         ) : (
-          <div className="match-time gold-time">{formatMatchTimeIST(dateUTC)}</div>
+          <div className="match-time-stack">
+            <div className="match-time gold-time">{formatMatchTimeIST(dateUTC)}</div>
+            <span>IST</span>
+          </div>
         )}
 
         <div className="match-team away">
@@ -119,6 +143,16 @@ export default function MatchCard({ match, variant = 'default' }) {
         </span>
         {isFinished ? <span className="round-badge">FINAL</span> : <span className={`watch-badge ${watch?.snackMode ? 'late-night' : 'evening-prime'}`}>{watch?.label || match.watchMode}</span>}
       </div>
+
+      {supportingTimes.length ? (
+        <div className="match-time-support">
+          {supportingTimes.map(([label, value]) => (
+            <span key={label}>
+              <strong>{label}:</strong> {value}
+            </span>
+          ))}
+        </div>
+      ) : null}
 
       {!isLive && !isFinished ? (
         <div className="match-card-footer" style={{ marginTop: 12 }}>

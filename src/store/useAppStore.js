@@ -51,6 +51,8 @@ export const useAppStore = create(
       setActivePage: (page) => set({ activePage: page }),
       appTheme: 'stadium',
       setAppTheme: (theme) => set({ appTheme: theme }),
+      timeDisplayMode: 'ist',
+      setTimeDisplayMode: (mode) => set({ timeDisplayMode: mode }),
 
       liveMatches: {},
       setLiveMatch: (matchId, value) =>
@@ -67,7 +69,8 @@ export const useAppStore = create(
       migrate: (persistedState) => ({
         ...persistedState,
         liveMatches: {},
-        appTheme: persistedState?.appTheme || 'stadium'
+        appTheme: persistedState?.appTheme || 'stadium',
+        timeDisplayMode: persistedState?.timeDisplayMode || 'ist'
       }),
       partialize: (state) => ({
         favoriteTeams: state.favoriteTeams,
@@ -79,7 +82,8 @@ export const useAppStore = create(
         activeFilter: state.activeFilter,
         searchQuery: state.searchQuery,
         activePage: state.activePage,
-        appTheme: state.appTheme
+        appTheme: state.appTheme,
+        timeDisplayMode: state.timeDisplayMode
       })
     }
   )

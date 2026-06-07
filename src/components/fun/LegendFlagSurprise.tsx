@@ -3,6 +3,7 @@ import { Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { LEGENDS, type Legend } from '../../data/legends'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
+import { CACHE_KEYS, readStorage } from '../../lib/storage'
 import LegendRevealModal from './LegendRevealModal'
 
 type LegendFlagSurpriseProps = {
@@ -11,6 +12,8 @@ type LegendFlagSurpriseProps = {
 }
 
 const SEEN_KEY = 'wc2026_legend_fun_seen'
+export const LEGEND_FUN_STORAGE_KEY = CACHE_KEYS.legendFunEnabled
+export const LEGEND_FUN_EVENT = 'wc2026:legend-fun-setting'
 
 function readSeenFunHint() {
   if (typeof window === 'undefined') return false
@@ -38,6 +41,7 @@ export default function LegendFlagSurprise({ className = '', compact = false }: 
   const [isOpen, setIsOpen] = useState(false)
   const [hasSeenFunHint, setHasSeenFunHint] = useState(readSeenFunHint)
   const [isMobile, setIsMobile] = useState(false)
+  const [enabled, setEnabled] = useState(() => readStorage<boolean>(LEGEND_FUN_STORAGE_KEY, true))
 
   const idleY = useMemo(() => (hasSeenFunHint ? [0, -1, 0] : [0, -3, 0]), [hasSeenFunHint])
 
@@ -52,6 +56,19 @@ export default function LegendFlagSurprise({ className = '', compact = false }: 
     return () => media.removeEventListener('change', updateMobileState)
   }, [])
 
+  useEffect(() => {
+    const updateEnabled = () => setEnabled(readStorage<boolean>(LEGEND_FUN_STORAGE_KEY, true))
+    updateEnabled()
+
+    window.addEventListener('storage', updateEnabled)
+    window.addEventListener(LEGEND_FUN_EVENT, updateEnabled)
+
+    return () => {
+      window.removeEventListener('storage', updateEnabled)
+      window.removeEventListener(LEGEND_FUN_EVENT, updateEnabled)
+    }
+  }, [])
+
   const revealLegend = (legend: Legend) => {
     setSelectedLegend(legend)
     setIsOpen(true)
@@ -61,7 +78,7 @@ export default function LegendFlagSurprise({ className = '', compact = false }: 
     }
   }
 
-  if (isMobile) return null
+  if (isMobile || !enabled) return null
 
   return (
     <>
