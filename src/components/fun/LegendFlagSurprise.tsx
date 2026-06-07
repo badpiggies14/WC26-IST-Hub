@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { LEGENDS, type Legend } from '../../data/legends'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import LegendRevealModal from './LegendRevealModal'
@@ -37,8 +37,20 @@ export default function LegendFlagSurprise({ className = '', compact = false }: 
   const [selectedLegend, setSelectedLegend] = useState<Legend | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [hasSeenFunHint, setHasSeenFunHint] = useState(readSeenFunHint)
+  const [isMobile, setIsMobile] = useState(false)
 
   const idleY = useMemo(() => (hasSeenFunHint ? [0, -1, 0] : [0, -3, 0]), [hasSeenFunHint])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined
+
+    const media = window.matchMedia('(max-width: 767px)')
+    const updateMobileState = () => setIsMobile(media.matches)
+    updateMobileState()
+
+    media.addEventListener('change', updateMobileState)
+    return () => media.removeEventListener('change', updateMobileState)
+  }, [])
 
   const revealLegend = (legend: Legend) => {
     setSelectedLegend(legend)
@@ -48,6 +60,8 @@ export default function LegendFlagSurprise({ className = '', compact = false }: 
       writeSeenFunHint()
     }
   }
+
+  if (isMobile) return null
 
   return (
     <>
