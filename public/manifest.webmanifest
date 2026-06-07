@@ -1,0 +1,16 @@
+{
+  "name": "FIFA 2026 HUB",
+  "short_name": "FIFA 2026",
+  "description": "World Cup 2026 match hub with every kickoff in IST.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050e20",
+  "theme_color": "#050e20",
+  "icons": [
+    {
+      "src": "/brand/wc26-ist-hub-mark.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
